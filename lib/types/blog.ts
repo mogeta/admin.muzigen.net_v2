@@ -28,7 +28,7 @@ export class Item implements BlogItem {
     public update_date: Timestamp,
     public created_date: Timestamp,
     public publish: boolean,
-    public elements: [],
+    public elements: unknown[],
   ) {}
 
   toString() {
