@@ -15,7 +15,7 @@ export class BlogService {
       const snapshot = await getDocs(q);
 
       snapshot.forEach((doc) => {
-        items.push(doc.data() as BlogItem);
+        items.push({ id: doc.id, ...doc.data() } as BlogItem);
       });
 
       return items;
