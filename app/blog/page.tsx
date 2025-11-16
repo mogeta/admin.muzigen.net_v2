@@ -6,19 +6,27 @@ import Image from 'next/image';
 import AuthGuard from '@/components/AuthGuard';
 import { blogService } from '@/lib/services/blogService';
 import { BlogItem } from '@/lib/types/blog';
+import { DocumentSnapshot } from 'firebase/firestore';
+
+const ITEMS_PER_PAGE = 9;
 
 function BlogListContent() {
   const { user, signOut } = useAuth();
   const [blogItems, setBlogItems] = useState<BlogItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastDoc, setLastDoc] = useState<DocumentSnapshot | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     async function fetchBlogContents() {
       try {
         setLoading(true);
-        const items = await blogService.getBlogContents();
-        setBlogItems(items);
+        const result = await blogService.getPaginatedBlogContents(ITEMS_PER_PAGE);
+        setBlogItems(result.items);
+        setLastDoc(result.lastDoc);
+        setHasMore(result.hasMore);
       } catch (err) {
         console.error('Failed to fetch blog contents:', err);
         setError('Failed to load blog contents. Please try again.');
@@ -30,9 +38,26 @@ function BlogListContent() {
     fetchBlogContents();
   }, []);
 
+  const loadMore = async () => {
+    if (!lastDoc || loadingMore) return;
+
+    try {
+      setLoadingMore(true);
+      const result = await blogService.getPaginatedBlogContents(ITEMS_PER_PAGE, lastDoc);
+      setBlogItems(prev => [...prev, ...result.items]);
+      setLastDoc(result.lastDoc);
+      setHasMore(result.hasMore);
+    } catch (err) {
+      console.error('Failed to load more blog contents:', err);
+      setError('Failed to load more blog contents. Please try again.');
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   const formatDate = (timestamp: import('firebase/firestore').Timestamp) => {
     if (!timestamp) return 'No date';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
     return date.toLocaleDateString('ja-JP', {
       year: 'numeric',
       month: 'long',
@@ -218,6 +243,34 @@ function BlogListContent() {
             <p className="text-zinc-600 dark:text-zinc-400">
               Get started by creating your first blog post.
             </p>
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {!loading && !error && hasMore && (
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-zinc-400 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {loadingMore ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Loading...
+                </>
+              ) : (
+                'Load More'
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Items Count */}
+        {!loading && !error && blogItems.length > 0 && (
+          <div className="mt-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
+            Showing {blogItems.length} blog post{blogItems.length !== 1 ? 's' : ''}
+            {hasMore && ' (more available)'}
           </div>
         )}
       </main>
