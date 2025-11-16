@@ -12,7 +12,7 @@ export interface BlogItem {
   update_date: Timestamp;
   created_date: Timestamp;
   publish: boolean;
-  elements: [];
+  elements: unknown[];
 }
 
 export class Item implements BlogItem {
