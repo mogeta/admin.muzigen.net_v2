@@ -30,7 +30,7 @@ function BlogListContent() {
     fetchBlogContents();
   }, []);
 
-  const formatDate = (timestamp: any) => {
+  const formatDate = (timestamp: import('firebase/firestore').Timestamp) => {
     if (!timestamp) return 'No date';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     return date.toLocaleDateString('ja-JP', {
