@@ -61,7 +61,8 @@ function BlogEditorContent() {
     if (id) {
       fetchBlogItem();
     }
-  }, [id, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const handleSave = async () => {
     if (!title.trim() || !description.trim() || !content.trim()) {

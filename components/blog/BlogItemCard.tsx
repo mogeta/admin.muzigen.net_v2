@@ -1,5 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 import { BlogItem } from '@/lib/types/blog';
+import Link from 'next/link';
 
 interface BlogItemCardProps {
   item: BlogItem;
@@ -69,12 +70,12 @@ export default function BlogItemCard({ item }: BlogItemCardProps) {
 
         {/* Actions */}
         <div className="flex gap-2 mt-4">
-          <a
+          <Link
             href={`/blog/edit/${item.id}`}
             className="flex-1 px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center"
           >
             Edit
-          </a>
+          </Link>
           {item.content_url && (
             <a
               href={item.content_url}
