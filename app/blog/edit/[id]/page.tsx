@@ -72,14 +72,21 @@ function BlogEditorContent() {
     try {
       setSaving(true);
 
+      // Build update data, excluding undefined values
       const updateData: Partial<BlogItem> = {
         title: title.trim(),
         description: description.trim(),
-        tag: tag.trim() || undefined,
         publish,
-        ogp_image: ogpImage.trim() || undefined,
         content: content.trim(),
       };
+
+      // Only add optional fields if they have values
+      if (tag.trim()) {
+        updateData.tag = tag.trim();
+      }
+      if (ogpImage.trim()) {
+        updateData.ogp_image = ogpImage.trim();
+      }
 
       await blogService.updateBlogContent(id, updateData);
       alert('Blog post updated successfully!');
