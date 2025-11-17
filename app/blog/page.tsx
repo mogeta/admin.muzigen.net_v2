@@ -16,7 +16,8 @@ function BlogListContent() {
     isLoadingMore,
     isReachingEnd,
     size,
-    setSize
+    setSize,
+    mutate
   } = usePaginatedBlogContents();
 
   const loadMore = () => {

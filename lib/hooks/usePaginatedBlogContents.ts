@@ -60,7 +60,7 @@ export function usePaginatedBlogContents() {
     return ['blog-contents-paginated', pageIndex, previousPageData?.lastDoc];
   };
 
-  const { data, error, size, setSize, isLoading, isValidating } = useSWRInfinite<PaginatedBlogData>(
+  const { data, error, size, setSize, isLoading, isValidating, mutate } = useSWRInfinite<PaginatedBlogData>(
     getKey,
     async ([, , lastDoc]: [string, number, DocumentSnapshot?]) => {
       const result = await blogService.getPaginatedBlogContents(ITEMS_PER_PAGE, lastDoc);
@@ -87,6 +87,7 @@ export function usePaginatedBlogContents() {
     isReachingEnd,
     size,
     setSize,
+    mutate, // Function to manually revalidate data
     // Helper to get all items flattened
     allItems: data ? data.flatMap(page => page.items) : [],
   };
