@@ -4,6 +4,8 @@ interface BlogEditHeaderProps {
   onSave: () => void;
   showPreview: boolean;
   saving: boolean;
+  title?: string;
+  saveLabel?: string;
 }
 
 export default function BlogEditHeader({
@@ -12,6 +14,8 @@ export default function BlogEditHeader({
   onSave,
   showPreview,
   saving,
+  title = 'Edit Blog Post',
+  saveLabel = 'Save Changes',
 }: BlogEditHeaderProps) {
   return (
     <header className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
@@ -25,7 +29,7 @@ export default function BlogEditHeader({
               ← Back to List
             </button>
             <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              Edit Blog Post
+              {title}
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -44,7 +48,7 @@ export default function BlogEditHeader({
               disabled={saving}
               className="px-6 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {saving ? 'Saving...' : 'Save Changes'}
+              {saving ? 'Saving...' : saveLabel}
             </button>
           </div>
         </div>
