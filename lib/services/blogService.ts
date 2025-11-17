@@ -1,4 +1,16 @@
-import { collection, getDocs, query, orderBy, limit, startAfter, DocumentSnapshot } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  updateDoc,
+  query,
+  orderBy,
+  limit,
+  startAfter,
+  DocumentSnapshot,
+  Timestamp
+} from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
 import { BlogItem } from '@/lib/types/blog';
 
@@ -80,6 +92,46 @@ export class BlogService {
   async getPublishedBlogContents(): Promise<BlogItem[]> {
     const items = await this.getBlogContents();
     return items.filter(item => item.publish === true);
+  }
+
+  /**
+   * Fetch a single blog content by ID
+   */
+  async getBlogContentById(id: string): Promise<BlogItem | null> {
+    try {
+      const docRef = doc(firestore, 'blog_contents', id);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() } as BlogItem;
+      } else {
+        console.error('Blog content not found:', id);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching blog content:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update a blog content
+   */
+  async updateBlogContent(id: string, data: Partial<BlogItem>): Promise<void> {
+    try {
+      const docRef = doc(firestore, 'blog_contents', id);
+
+      // Always update the update_date
+      const updateData = {
+        ...data,
+        update_date: Timestamp.now()
+      };
+
+      await updateDoc(docRef, updateData);
+    } catch (error) {
+      console.error('Error updating blog content:', error);
+      throw error;
+    }
   }
 }
 

@@ -69,6 +69,12 @@ export default function BlogItemCard({ item }: BlogItemCardProps) {
 
         {/* Actions */}
         <div className="flex gap-2 mt-4">
+          <a
+            href={`/blog/edit/${item.id}`}
+            className="flex-1 px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center"
+          >
+            Edit
+          </a>
           {item.content_url && (
             <a
               href={item.content_url}
