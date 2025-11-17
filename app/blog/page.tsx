@@ -80,13 +80,26 @@ function BlogListContent() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-            Blog Posts
-          </h2>
-          <p className="text-zinc-600 dark:text-zinc-400">
-            Manage and view all blog contents
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+              Blog Posts
+            </h2>
+            <p className="text-zinc-600 dark:text-zinc-400">
+              Manage and view all blog contents
+            </p>
+          </div>
+          {/* Refresh button - SWRのmutate機能を使用 */}
+          <button
+            onClick={() => mutate()}
+            disabled={loading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
         </div>
 
         {/* Loading State */}
@@ -99,7 +112,22 @@ function BlogListContent() {
         {/* Error State */}
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-            <p className="text-red-800 dark:text-red-200">{error}</p>
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-red-800 dark:text-red-200 font-semibold mb-1">
+                  Failed to load blog contents
+                </h3>
+                <p className="text-red-700 dark:text-red-300 text-sm">
+                  {error.message || 'An error occurred while fetching data.'}
+                </p>
+              </div>
+              <button
+                onClick={() => mutate()}
+                className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
           </div>
         )}
 
