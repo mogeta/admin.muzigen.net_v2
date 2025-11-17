@@ -9,7 +9,8 @@ import {
   limit,
   startAfter,
   DocumentSnapshot,
-  Timestamp
+  Timestamp,
+  QueryConstraint
 } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
 import { BlogItem } from '@/lib/types/blog';
@@ -54,7 +55,8 @@ export class BlogService {
 
     try {
       const c = collection(firestore, 'blog_contents');
-      const queryConstraints = [
+      // Explicitly type the array as QueryConstraint[] to avoid type inference issues
+      const queryConstraints: QueryConstraint[] = [
         orderBy('update_date', 'desc'),
       ];
 
