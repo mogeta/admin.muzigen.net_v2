@@ -17,7 +17,7 @@ export function useBlogEditor(id: string) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [blogItem, setBlogItem] = useState<BlogItem | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
 
   // Form state
   const [title, setTitle] = useState('');
