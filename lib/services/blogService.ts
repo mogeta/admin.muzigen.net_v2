@@ -3,6 +3,7 @@ import {
   getDocs,
   getDoc,
   doc,
+  addDoc,
   updateDoc,
   query,
   orderBy,
@@ -112,6 +113,37 @@ export class BlogService {
       }
     } catch (error) {
       console.error('Error fetching blog content:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create a new blog content
+   */
+  async createBlogContent(data: Omit<BlogItem, 'id' | 'created_date' | 'update_date'>): Promise<string> {
+    try {
+      const now = Timestamp.now();
+      const c = collection(firestore, 'blog_contents');
+
+      // Set required fields with defaults
+      const newBlogData = {
+        title: data.title || '',
+        description: data.description || '',
+        publish: data.publish ?? false,
+        tag: data.tag,
+        ogp_image: data.ogp_image,
+        content_url: data.content_url,
+        markdown_url: data.markdown_url,
+        content: data.content || '',
+        elements: data.elements,
+        created_date: now,
+        update_date: now
+      };
+
+      const docRef = await addDoc(c, newBlogData);
+      return docRef.id;
+    } catch (error) {
+      console.error('Error creating blog content:', error);
       throw error;
     }
   }
