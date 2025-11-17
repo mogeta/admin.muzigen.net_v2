@@ -4,15 +4,15 @@ export interface BlogItem {
   id: string;
   title: string;
   description: string;
-  ogp_image: string;
-  content: string;
-  tag: string;
-  content_url: string;
-  markdown_url: string;
-  update_date: Timestamp;
-  created_date: Timestamp;
   publish: boolean;
-  elements: unknown[];
+  tag?: string;
+  ogp_image?: string;
+  content_url?: string;
+  markdown_url?: string;
+  created_date: Timestamp;
+  update_date: Timestamp;
+  content?: string;
+  elements?: unknown[];
 }
 
 export class Item implements BlogItem {
@@ -20,15 +20,15 @@ export class Item implements BlogItem {
     public id: string,
     public title: string,
     public description: string,
-    public ogp_image: string,
-    public content: string,
-    public tag: string,
-    public content_url: string,
-    public markdown_url: string,
-    public update_date: Timestamp,
-    public created_date: Timestamp,
     public publish: boolean,
-    public elements: unknown[],
+    public created_date: Timestamp,
+    public update_date: Timestamp,
+    public tag?: string,
+    public ogp_image?: string,
+    public content_url?: string,
+    public markdown_url?: string,
+    public content?: string,
+    public elements?: unknown[],
   ) {}
 
   toString() {
