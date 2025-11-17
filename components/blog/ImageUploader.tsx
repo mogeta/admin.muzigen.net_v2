@@ -56,9 +56,9 @@ export default function ImageUploader({ onImageUploaded }: ImageUploaderProps) {
     }
 
     // ファイルサイズの検証（10MB）
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setError('ファイルサイズは10MB以下にしてください');
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      setError(`ファイルサイズは${MAX_FILE_SIZE / 1024 / 1024}MB以下にしてください`);
       return;
     }
 
