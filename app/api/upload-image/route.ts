@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
     await webpFile.makePublic();
 
     // WebP画像の公開URLを取得
-    const webpUrl = `https://storage.googleapis.com/${bucket.name}/${webpFile.name}`;
+    const webpUrl = webpFile.publicUrl();
 
     return NextResponse.json({
       success: true,
