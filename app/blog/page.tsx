@@ -3,17 +3,30 @@
 import { useAuth } from '@/lib/AuthContext';
 import Image from 'next/image';
 import AuthGuard from '@/components/AuthGuard';
-import { useBlogContents } from '@/lib/hooks/useBlogContents';
+import { usePaginatedBlogContents } from '@/lib/hooks/usePaginatedBlogContents';
 
 function BlogListContent() {
   const { user, signOut } = useAuth();
 
-  // ✅ SWRを使用したデータフェッチング（useEffectの代わり）
-  const { data: blogItems, error, isLoading: loading, mutate } = useBlogContents();
+  // ✅ SWR Infiniteを使用したページネーション対応データフェッチング
+  const {
+    allItems: blogItems,
+    error,
+    isLoading: loading,
+    isLoadingMore,
+    isReachingEnd,
+    size,
+    setSize,
+    mutate
+  } = usePaginatedBlogContents();
 
-  const formatDate = (timestamp: import('firebase/firestore').Timestamp) => {
+  const loadMore = () => {
+    setSize(size + 1);
+  };
+
+  const formatDate = (timestamp: Timestamp) => {
     if (!timestamp) return 'No date';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
     return date.toLocaleDateString('ja-JP', {
       year: 'numeric',
       month: 'long',
@@ -227,6 +240,34 @@ function BlogListContent() {
             <p className="text-zinc-600 dark:text-zinc-400">
               Get started by creating your first blog post.
             </p>
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {!loading && !error && !isReachingEnd && (
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={loadMore}
+              disabled={isLoadingMore}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-zinc-400 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {isLoadingMore ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Loading...
+                </>
+              ) : (
+                'Load More'
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Items Count */}
+        {!loading && !error && blogItems.length > 0 && (
+          <div className="mt-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
+            Showing {blogItems.length} blog post{blogItems.length !== 1 ? 's' : ''}
+            {!isReachingEnd && ' (more available)'}
           </div>
         )}
       </main>
