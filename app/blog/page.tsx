@@ -24,7 +24,7 @@ function BlogListContent() {
     setSize(size + 1);
   };
 
-  const formatDate = (timestamp: import('firebase/firestore').Timestamp) => {
+  const formatDate = (timestamp: Timestamp) => {
     if (!timestamp) return 'No date';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
     return date.toLocaleDateString('ja-JP', {
