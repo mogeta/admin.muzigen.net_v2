@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { app } from '@/lib/firebase';
+import { getAdminStorage } from '@/lib/firebase-admin';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -44,13 +43,16 @@ export async function POST(request: NextRequest) {
     // WebPファイル名
     const webpFileName = `${baseFileName}.webp`;
 
-    // Firebase Storageのインスタンスを取得
-    const storage = getStorage(app);
+    // Firebase Admin Storageのインスタンスを取得
+    const storage = getAdminStorage();
+    const bucket = storage.bucket();
 
     // 元の画像をアップロード
-    const originalRef = ref(storage, `img/${originalFileName}`);
-    await uploadBytes(originalRef, buffer, {
-      contentType: file.type,
+    const originalFile = bucket.file(`img/${originalFileName}`);
+    await originalFile.save(buffer, {
+      metadata: {
+        contentType: file.type,
+      },
     });
 
     // WebPに変換
@@ -59,13 +61,18 @@ export async function POST(request: NextRequest) {
       .toBuffer();
 
     // WebP画像をアップロード
-    const webpRef = ref(storage, `webp/${webpFileName}`);
-    await uploadBytes(webpRef, webpBuffer, {
-      contentType: 'image/webp',
+    const webpFile = bucket.file(`webp/${webpFileName}`);
+    await webpFile.save(webpBuffer, {
+      metadata: {
+        contentType: 'image/webp',
+      },
     });
 
+    // WebP画像を公開設定にする
+    await webpFile.makePublic();
+
     // WebP画像の公開URLを取得
-    const webpUrl = await getDownloadURL(webpRef);
+    const webpUrl = `https://storage.googleapis.com/${bucket.name}/${webpFile.name}`;
 
     return NextResponse.json({
       success: true,
