@@ -42,11 +42,15 @@ export class BlogService {
 
     try {
       const c = collection(firestore, 'blog_contents');
-      let q = query(c, orderBy('update_date', 'desc'), limit(pageSize + 1));
+      const queryConstraints = [
+        orderBy('update_date', 'desc'),
+      ];
 
       if (lastDocument) {
-        q = query(c, orderBy('update_date', 'desc'), startAfter(lastDocument), limit(pageSize + 1));
+        queryConstraints.push(startAfter(lastDocument));
       }
+      queryConstraints.push(limit(pageSize + 1));
+      const q = query(c, ...queryConstraints);
 
       const snapshot = await getDocs(q);
       const docs = snapshot.docs;
