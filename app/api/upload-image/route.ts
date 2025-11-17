@@ -1,10 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminStorage } from '@/lib/firebase-admin';
+import { getAdminStorage, getAdminApp } from '@/lib/firebase-admin';
+import { getAuth } from 'firebase-admin/auth';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 
+// 最大ファイルサイズ: 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+// 許可する画像タイプ
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/svg+xml',
+];
+
+// 許可する拡張子
+const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+
 export async function POST(request: NextRequest) {
   try {
+    // 認証チェック
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: '認証が必要です' },
+        { status: 401 }
+      );
+    }
+
+    // Firebase認証トークンを検証
+    const token = authHeader.split('Bearer ')[1];
+    try {
+      const adminApp = getAdminApp();
+      const auth = getAuth(adminApp);
+      await auth.verifyIdToken(token);
+    } catch (authError) {
+      console.error('認証エラー:', authError);
+      return NextResponse.json(
+        { error: '認証トークンが無効です' },
+        { status: 401 }
+      );
+    }
+
     // FormDataから画像ファイルを取得
     const formData = await request.formData();
     const file = formData.get('file') as File;
@@ -16,10 +56,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ファイルタイプの検証
-    if (!file.type.startsWith('image/')) {
+    // ファイルサイズの検証
+    if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: '画像ファイルのみアップロード可能です' },
+        { error: `ファイルサイズは${MAX_FILE_SIZE / 1024 / 1024}MB以下にしてください` },
+        { status: 400 }
+      );
+    }
+
+    // ファイルタイプの検証
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: '許可されていない画像形式です。JPEG, PNG, GIF, WebP, SVGのみアップロード可能です。' },
         { status: 400 }
       );
     }
@@ -36,8 +84,14 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // 元の画像の拡張子を取得
-    const originalExtension = file.name.split('.').pop() || 'jpg';
+    // 元の画像の拡張子を取得・検証
+    const originalExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    if (!ALLOWED_EXTENSIONS.includes(originalExtension)) {
+      return NextResponse.json(
+        { error: '許可されていないファイル拡張子です' },
+        { status: 400 }
+      );
+    }
     const originalFileName = `${baseFileName}.${originalExtension}`;
 
     // WebPファイル名
@@ -54,6 +108,9 @@ export async function POST(request: NextRequest) {
         contentType: file.type,
       },
     });
+
+    // 元の画像を公開設定にする
+    await originalFile.makePublic();
 
     // WebPに変換
     const webpBuffer = await sharp(buffer)
@@ -81,8 +138,21 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('画像アップロードエラー:', error);
+
+    // エラーの詳細をログに記録
+    if (error instanceof Error) {
+      console.error('エラーメッセージ:', error.message);
+      console.error('スタックトレース:', error.stack);
+    }
+
+    // クライアントには安全なエラーメッセージを返す
     return NextResponse.json(
-      { error: '画像のアップロードに失敗しました' },
+      {
+        error: '画像のアップロードに失敗しました',
+        details: process.env.NODE_ENV === 'development' && error instanceof Error
+          ? error.message
+          : undefined,
+      },
       { status: 500 }
     );
   }

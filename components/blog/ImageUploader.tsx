@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, DragEvent, ChangeEvent } from 'react';
+import { auth } from '@/lib/firebase';
 
 interface ImageUploaderProps {
   onImageUploaded: (imageUrl: string) => void;
@@ -54,10 +55,25 @@ export default function ImageUploader({ onImageUploaded }: ImageUploaderProps) {
       return;
     }
 
+    // ファイルサイズの検証（10MB）
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setError('ファイルサイズは10MB以下にしてください');
+      return;
+    }
+
     setIsUploading(true);
     setError(null);
 
     try {
+      // Firebase認証トークンを取得
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error('ログインが必要です');
+      }
+
+      const token = await user.getIdToken();
+
       // FormDataを作成
       const formData = new FormData();
       formData.append('file', file);
@@ -65,6 +81,9 @@ export default function ImageUploader({ onImageUploaded }: ImageUploaderProps) {
       // APIにアップロード
       const response = await fetch('/api/upload-image', {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
 
