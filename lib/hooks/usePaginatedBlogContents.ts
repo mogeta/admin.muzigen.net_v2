@@ -13,6 +13,18 @@ interface PaginatedBlogData {
   hasMore: boolean;
 }
 
+interface UsePaginatedBlogContentsReturn {
+  data: PaginatedBlogData[] | undefined;
+  error: any;
+  isLoading: boolean;
+  isLoadingMore: boolean;
+  isReachingEnd: boolean;
+  size: number;
+  setSize: (size: number | ((_size: number) => number)) => Promise<PaginatedBlogData[] | undefined>;
+  mutate: () => Promise<PaginatedBlogData[] | undefined>;
+  allItems: BlogItem[];
+}
+
 /**
  * Custom hook to fetch paginated blog contents using SWR Infinite
  *
@@ -48,7 +60,7 @@ interface PaginatedBlogData {
  *   );
  * }
  */
-export function usePaginatedBlogContents() {
+export function usePaginatedBlogContents(): UsePaginatedBlogContentsReturn {
   const getKey = (pageIndex: number, previousPageData: PaginatedBlogData | null) => {
     // If reached the end, return null to stop fetching
     if (previousPageData && !previousPageData.hasMore) return null;
@@ -75,9 +87,10 @@ export function usePaginatedBlogContents() {
     }
   );
 
-  const isLoadingMore = isValidating && data && typeof data[size - 1] !== 'undefined';
+  // Explicitly cast to boolean to avoid type issues
+  const isLoadingMore = !!(isValidating && data && typeof data[size - 1] !== 'undefined');
   const isEmpty = data?.[0]?.items.length === 0;
-  const isReachingEnd = isEmpty || (data && !data[data.length - 1]?.hasMore);
+  const isReachingEnd = !!(isEmpty || (data && !data[data.length - 1]?.hasMore));
 
   return {
     data,
