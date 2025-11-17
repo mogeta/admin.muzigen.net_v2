@@ -1,58 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import Image from 'next/image';
 import AuthGuard from '@/components/AuthGuard';
-import { blogService } from '@/lib/services/blogService';
-import { BlogItem } from '@/lib/types/blog';
-import { DocumentSnapshot } from 'firebase/firestore';
-
-const ITEMS_PER_PAGE = 9;
+import { usePaginatedBlogContents } from '@/lib/hooks/usePaginatedBlogContents';
 
 function BlogListContent() {
   const { user, signOut } = useAuth();
-  const [blogItems, setBlogItems] = useState<BlogItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [lastDoc, setLastDoc] = useState<DocumentSnapshot | null>(null);
-  const [hasMore, setHasMore] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
 
-  useEffect(() => {
-    async function fetchBlogContents() {
-      try {
-        setLoading(true);
-        const result = await blogService.getPaginatedBlogContents(ITEMS_PER_PAGE);
-        setBlogItems(result.items);
-        setLastDoc(result.lastDoc);
-        setHasMore(result.hasMore);
-      } catch (err) {
-        console.error('Failed to fetch blog contents:', err);
-        setError('Failed to load blog contents. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    }
+  // ✅ SWR Infiniteを使用したページネーション対応データフェッチング
+  const {
+    allItems: blogItems,
+    error,
+    isLoading: loading,
+    isLoadingMore,
+    isReachingEnd,
+    size,
+    setSize
+  } = usePaginatedBlogContents();
 
-    fetchBlogContents();
-  }, []);
-
-  const loadMore = async () => {
-    if (!lastDoc || loadingMore) return;
-
-    try {
-      setLoadingMore(true);
-      const result = await blogService.getPaginatedBlogContents(ITEMS_PER_PAGE, lastDoc);
-      setBlogItems(prev => [...prev, ...result.items]);
-      setLastDoc(result.lastDoc);
-      setHasMore(result.hasMore);
-    } catch (err) {
-      console.error('Failed to load more blog contents:', err);
-      setError('Failed to load more blog contents. Please try again.');
-    } finally {
-      setLoadingMore(false);
-    }
+  const loadMore = () => {
+    setSize(size + 1);
   };
 
   const formatDate = (timestamp: import('firebase/firestore').Timestamp) => {
@@ -247,14 +215,14 @@ function BlogListContent() {
         )}
 
         {/* Load More Button */}
-        {!loading && !error && hasMore && (
+        {!loading && !error && !isReachingEnd && (
           <div className="mt-8 flex justify-center">
             <button
               onClick={loadMore}
-              disabled={loadingMore}
+              disabled={isLoadingMore}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-zinc-400 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {loadingMore ? (
+              {isLoadingMore ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   Loading...
@@ -270,7 +238,7 @@ function BlogListContent() {
         {!loading && !error && blogItems.length > 0 && (
           <div className="mt-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
             Showing {blogItems.length} blog post{blogItems.length !== 1 ? 's' : ''}
-            {hasMore && ' (more available)'}
+            {!isReachingEnd && ' (more available)'}
           </div>
         )}
       </main>

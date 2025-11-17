@@ -15,7 +15,8 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-simplemde-editor": "^5.2.0",
-    "simplemde": "^1.11.2"
+    "simplemde": "^1.11.2",
+    "swr": "^2.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
