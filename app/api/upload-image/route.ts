@@ -85,10 +85,10 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // 元の画像の拡張子を取得・検証
-    const originalExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    if (!ALLOWED_EXTENSIONS.includes(originalExtension)) {
+    const originalExtension = file.name.split('.').pop()?.toLowerCase();
+    if (!originalExtension || !ALLOWED_EXTENSIONS.includes(originalExtension)) {
       return NextResponse.json(
-        { error: '許可されていないファイル拡張子です' },
+        { error: '許可されていない、または不明なファイル拡張子です。' },
         { status: 400 }
       );
     }
