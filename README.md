@@ -38,9 +38,8 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
 # Firebase Admin SDK（サーバーサイド）
-FIREBASE_PROJECT_ID=your_project_id
-FIREBASE_CLIENT_EMAIL=your_client_email
-FIREBASE_PRIVATE_KEY=your_private_key
+# サービスアカウントのJSONキーを単一の環境変数として設定します
+FIREBASE_SERVICE_ACCOUNT_KEY='<your-service-account-key-json>'
 ```
 
 ## セットアップ
