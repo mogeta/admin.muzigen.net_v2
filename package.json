@@ -10,7 +10,9 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "easymde": "^2.20.0",
@@ -32,6 +34,10 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-interactions": "^8.6.14",
+    "@storybook/react-vite": "^8.6.14",
+    "@storybook/test": "^8.6.14",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -45,8 +51,10 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
     "happy-dom": "^20.0.10",
+    "storybook": "^8.6.14",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vite": "^6.4.1",
     "vitest": "^4.0.9"
   }
 }
