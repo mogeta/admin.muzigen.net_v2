@@ -130,14 +130,15 @@ export class BlogService {
         title: data.title || '',
         description: data.description || '',
         publish: data.publish ?? false,
-        tag: data.tag,
-        ogp_image: data.ogp_image,
-        content_url: data.content_url,
-        markdown_url: data.markdown_url,
         content: data.content || '',
-        elements: data.elements,
         created_date: now,
-        update_date: now
+        update_date: now,
+        // Only include optional fields if they have defined values
+        ...(data.tag !== undefined && { tag: data.tag }),
+        ...(data.ogp_image !== undefined && { ogp_image: data.ogp_image }),
+        ...(data.content_url !== undefined && { content_url: data.content_url }),
+        ...(data.markdown_url !== undefined && { markdown_url: data.markdown_url }),
+        ...(data.elements !== undefined && { elements: data.elements }),
       };
 
       const docRef = await addDoc(c, newBlogData);
