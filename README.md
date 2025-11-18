@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# admin.muzigen.net v2
 
-## Getting Started
+muzigen.net の管理パネル（バージョン2）です。ブログ記事の作成・編集・管理などの管理機能を提供します。
 
-First, run the development server:
+## 主な機能
+
+- **認証システム**: Firebase Authentication による Google サインイン
+- **ブログ管理**: Markdown エディターを使用した記事の作成・編集・削除
+- **ダッシュボード**: 管理画面のメインダッシュボード
+- **画像アップロード**: 記事内で使用する画像のアップロード機能
+- **設定管理**: アプリケーション設定の管理
+
+## 技術スタック
+
+- **フレームワーク**: Next.js 16.0.0 (App Router)
+- **言語**: TypeScript
+- **UI**: React 19.2.0
+- **スタイリング**: Tailwind CSS 4
+- **認証**: Firebase Authentication
+- **データベース**: Firebase (Firestore)
+- **ストレージ**: Firebase Storage
+- **Markdown エディター**: SimpleMDE / EasyMDE
+- **Markdown レンダリング**: react-markdown + rehype plugins
+- **テスト**: Vitest + Testing Library
+- **データフェッチング**: SWR
+
+## 環境変数の設定
+
+プロジェクトルートに `.env.local` ファイルを作成し、以下の環境変数を設定してください：
+
+```env
+# Firebase クライアント設定
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+
+# Firebase Admin SDK（サーバーサイド）
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_CLIENT_EMAIL=your_client_email
+FIREBASE_PRIVATE_KEY=your_private_key
+```
+
+## セットアップ
+
+1. リポジトリをクローン:
+
+```bash
+git clone <repository-url>
+cd admin.muzigen.net_v2
+```
+
+2. 依存関係をインストール:
+
+```bash
+npm install
+```
+
+3. 環境変数を設定（上記参照）
+
+## 開発
+
+開発サーバーを起動:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開いてください。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## テスト
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# テストを実行
+npm test
 
-## Learn More
+# テストを1回だけ実行
+npm run test:run
 
-To learn more about Next.js, take a look at the following resources:
+# カバレッジを表示
+npm run test:coverage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# テスト UI を起動
+npm run test:ui
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ビルド
 
-## Deploy on Vercel
+```bash
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 本番環境での起動
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm start
+```
+
+## プロジェクト構造
+
+```
+admin.muzigen.net_v2/
+├── app/                    # Next.js App Router ページ
+│   ├── api/               # API ルート
+│   ├── blog/              # ブログ管理ページ
+│   ├── dashboard/         # ダッシュボード
+│   ├── settings/          # 設定ページ
+│   └── signin/            # サインインページ
+├── components/            # React コンポーネント
+│   ├── blog/             # ブログ関連コンポーネント
+│   └── AuthGuard.tsx     # 認証ガード
+├── lib/                   # ユーティリティとライブラリ
+│   ├── firebase.ts       # Firebase クライアント設定
+│   ├── firebase-admin.ts # Firebase Admin 設定
+│   ├── AuthContext.tsx   # 認証コンテキスト
+│   ├── hooks/            # カスタムフック
+│   ├── services/         # ビジネスロジック
+│   └── types/            # TypeScript 型定義
+├── docs/                  # ドキュメント
+└── public/                # 静的ファイル
+```
+
+## コーディング規約
+
+- TypeScript の厳格モードを使用
+- ESLint でコードの品質を保証
+- Tailwind CSS でスタイリング
+- コンポーネントはできるだけ小さく、再利用可能に設計
+
+## ドキュメント
+
+より詳細な情報は `docs/` ディレクトリを参照してください：
+
+- [AUTH_PATTERNS.md](./docs/AUTH_PATTERNS.md) - 認証パターンとベストプラクティス
+- [BLOG_PAGE_IMPROVEMENTS.md](./docs/BLOG_PAGE_IMPROVEMENTS.md) - ブログページの改善履歴
+- [DATA_FETCHING_PATTERNS.md](./docs/DATA_FETCHING_PATTERNS.md) - データフェッチングパターン
+
+## ライセンス
+
+Private
