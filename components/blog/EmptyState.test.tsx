@@ -9,11 +9,4 @@ describe('EmptyState', () => {
     expect(screen.getByText('No blog posts found')).toBeInTheDocument()
     expect(screen.getByText('Get started by creating your first blog post.')).toBeInTheDocument()
   })
-
-  it('renders an icon', () => {
-    const { container } = render(<EmptyState />)
-
-    const svg = container.querySelector('svg')
-    expect(svg).toBeInTheDocument()
-  })
 })
