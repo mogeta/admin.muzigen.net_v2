@@ -102,24 +102,23 @@ npm start
 ```
 admin.muzigen.net_v2/
 ├── app/                    # Next.js App Router ページ
-│   ├── api/               # API ルート
-│   ├── blog/              # ブログ管理ページ
-│   ├── dashboard/         # ダッシュボード
-│   ├── settings/          # 設定ページ
-│   └── signin/            # サインインページ
-├── components/            # React コンポーネント
-│   ├── blog/             # ブログ関連コンポーネント
-│   └── AuthGuard.tsx     # 認証ガード
-├── lib/                   # ユーティリティとライブラリ
-│   ├── firebase.ts       # Firebase クライアント設定
-│   ├── firebase-admin.ts # Firebase Admin 設定
-│   ├── AuthContext.tsx   # 認証コンテキスト
-│   ├── hooks/            # カスタムフック
-│   ├── services/         # ビジネスロジック
-│   └── types/            # TypeScript 型定義
-├── docs/                  # ドキュメント
-└── public/                # 静的ファイル
-```
+│   ├── api/                # API ルート
+│   ├── blog/               # ブログ管理ページ
+│   ├── dashboard/          # ダッシュボード
+│   ├── settings/           # 設定ページ
+│   └── signin/             # サインインページ
+├── components/             # React コンポーネント
+│   ├── blog/               # ブログ関連コンポーネント
+│   └── AuthGuard.tsx       # 認証ガード
+├── lib/                    # ユーティリティとライブラリ
+│   ├── firebase.ts         # Firebase クライアント設定
+│   ├── firebase-admin.ts   # Firebase Admin 設定
+│   ├── AuthContext.tsx     # 認証コンテキスト
+│   ├── hooks/              # カスタムフック
+│   ├── services/           # ビジネスロジック
+│   └── types/              # TypeScript 型定義
+├── docs/                   # ドキュメント
+└── public/                 # 静的ファイル
 
 ## コーディング規約
 
