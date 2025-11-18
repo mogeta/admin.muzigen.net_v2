@@ -48,7 +48,7 @@ FIREBASE_SERVICE_ACCOUNT_KEY='<your-service-account-key-json>'
 
 ```bash
 git clone <repository-url>
-cd admin.muzigen.net_v2
+cd <repository-name>
 ```
 
 2. 依存関係をインストール:
