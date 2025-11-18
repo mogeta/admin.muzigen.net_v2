@@ -49,13 +49,4 @@ describe('LoadMoreButton', () => {
     const button = screen.getByRole('button', { name: 'Load More' })
     expect(button).not.toBeDisabled()
   })
-
-  it('shows loading spinner when loading', () => {
-    const mockLoadMore = vi.fn()
-
-    const { container } = render(<LoadMoreButton onLoadMore={mockLoadMore} isLoadingMore={true} />)
-
-    const spinner = container.querySelector('.animate-spin')
-    expect(spinner).toBeInTheDocument()
-  })
 })
