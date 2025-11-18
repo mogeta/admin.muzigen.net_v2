@@ -276,40 +276,44 @@ describe('POST /api/upload-image', () => {
 
     it('should include error details in development mode', async () => {
       const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      try {
+        process.env.NODE_ENV = 'development';
 
-      const file = createMockFile('test-image-data', 'test.jpg', 'image/jpeg');
-      const request = createNextRequest(validHeaders, file);
+        const file = createMockFile('test-image-data', 'test.jpg', 'image/jpeg');
+        const request = createNextRequest(validHeaders, file);
 
-      const uploadError = new Error('Upload failed');
-      mockFile.save.mockRejectedValueOnce(uploadError);
+        const uploadError = new Error('Upload failed');
+        mockFile.save.mockRejectedValueOnce(uploadError);
 
-      const response = await POST(request);
-      const json = await response.json();
+        const response = await POST(request);
+        const json = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(json.details).toBe('Upload failed');
-
-      process.env.NODE_ENV = originalEnv;
+        expect(response.status).toBe(500);
+        expect(json.details).toBe('Upload failed');
+      } finally {
+        process.env.NODE_ENV = originalEnv;
+      }
     });
 
     it('should not include error details in production mode', async () => {
       const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'production';
+      try {
+        process.env.NODE_ENV = 'production';
 
-      const file = createMockFile('test-image-data', 'test.jpg', 'image/jpeg');
-      const request = createNextRequest(validHeaders, file);
+        const file = createMockFile('test-image-data', 'test.jpg', 'image/jpeg');
+        const request = createNextRequest(validHeaders, file);
 
-      const uploadError = new Error('Upload failed');
-      mockFile.save.mockRejectedValueOnce(uploadError);
+        const uploadError = new Error('Upload failed');
+        mockFile.save.mockRejectedValueOnce(uploadError);
 
-      const response = await POST(request);
-      const json = await response.json();
+        const response = await POST(request);
+        const json = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(json.details).toBeUndefined();
-
-      process.env.NODE_ENV = originalEnv;
+        expect(response.status).toBe(500);
+        expect(json.details).toBeUndefined();
+      } finally {
+        process.env.NODE_ENV = originalEnv;
+      }
     });
   });
 });
