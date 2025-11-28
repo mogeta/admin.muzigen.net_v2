@@ -36,9 +36,11 @@ export default function Home() {
                 Signed in as: <span className="font-medium text-zinc-900 dark:text-zinc-100">{user.email}</span>
               </p>
               {user.photoURL && (
-                <img
+                <Image
                   src={user.photoURL}
                   alt="Profile"
+				  width={40}
+				  height={40}
                   className="w-16 h-16 rounded-full mb-4"
                 />
               )}
