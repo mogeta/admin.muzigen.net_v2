@@ -1,11 +1,14 @@
 import Link from 'next/link';
+import ViewToggle, { ViewMode } from './ViewToggle';
 
 interface BlogPageHeaderProps {
   onRefresh: () => void;
   isLoading: boolean;
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
 }
 
-export default function BlogPageHeader({ onRefresh, isLoading }: BlogPageHeaderProps) {
+export default function BlogPageHeader({ onRefresh, isLoading, viewMode, onViewModeChange }: BlogPageHeaderProps) {
   return (
     <div className="mb-8 flex items-center justify-between">
       <div>
@@ -17,6 +20,7 @@ export default function BlogPageHeader({ onRefresh, isLoading }: BlogPageHeaderP
         </p>
       </div>
       <div className="flex items-center gap-2">
+        <ViewToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
         <Link
           href="/blog/create"
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
