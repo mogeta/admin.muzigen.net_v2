@@ -44,10 +44,10 @@ export default function Home() {
               )}
               <div className="flex gap-3">
                 <Link
-                  href="/dashboard"
+                  href="/blog"
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Go to Dashboard
+                  Go to Blog
                 </Link>
                 <button
                   onClick={signOut}
