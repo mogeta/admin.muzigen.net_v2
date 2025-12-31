@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #ffffff;
@@ -44,16 +45,18 @@ body {
   --color-blockquote-border: #3182ce;
 }
 
-.dark .markdown-preview {
-  --color-text-primary: #f7fafc;
-  --color-text-secondary: #cbd5e0;
-  --color-text-code: #e2e8f0;
-  --color-link-default: #63b3ed;
-  --color-link-hover: #90cdf4;
-  --color-border: #4a5568;
-  --color-bg-code: #1a202c;
-  --color-bg-blockquote: #2d3748;
-  --color-blockquote-border: #63b3ed;
+@media (prefers-color-scheme: dark) {
+  .markdown-preview {
+    --color-text-primary: #f7fafc;
+    --color-text-secondary: #cbd5e0;
+    --color-text-code: #e2e8f0;
+    --color-link-default: #63b3ed;
+    --color-link-hover: #90cdf4;
+    --color-border: #4a5568;
+    --color-bg-code: #1a202c;
+    --color-bg-blockquote: #2d3748;
+    --color-blockquote-border: #63b3ed;
+  }
 }
 
 .markdown-preview h1,
