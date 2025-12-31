@@ -1,0 +1,24 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "blog_contents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "publish",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_date",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ],
+      "density": "SPARSE_ALL"
+    }
+  ],
+  "fieldOverrides": []
+}

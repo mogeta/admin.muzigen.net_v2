@@ -65,12 +65,15 @@ export default function BlogItemsList({ items }: BlogItemsListProps) {
                     >
                       {item.publish ? 'Published' : 'Draft'}
                     </span>
-                    {item.tag && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 font-medium">
+                    {item.tags && item.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 font-medium"
+                      >
                         <Tag size={12} />
-                        {item.tag}
+                        {tag}
                       </span>
-                    )}
+                    ))}
                     <span className="inline-flex items-center gap-1">
                       <Calendar size={12} />
                       {formatDate(item.update_date)}

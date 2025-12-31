@@ -3,7 +3,7 @@ import MarkdownPreview from '@/components/blog/MarkdownPreview';
 interface BlogPreviewPanelProps {
   title: string;
   description: string;
-  tag: string;
+  tags: string[];
   ogpImage: string;
   content: string;
 }
@@ -11,7 +11,7 @@ interface BlogPreviewPanelProps {
 export default function BlogPreviewPanel({
   title,
   description,
-  tag,
+  tags,
   ogpImage,
   content,
 }: BlogPreviewPanelProps) {
@@ -35,10 +35,17 @@ export default function BlogPreviewPanel({
       <p className="text-zinc-600 dark:text-zinc-400 mb-4">
         {description || 'No description'}
       </p>
-      {tag && (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 mb-4">
-          {tag}
-        </span>
+      {tags && tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
       )}
       <div className="mt-6">
         <MarkdownPreview content={content || '*No content yet*'} />

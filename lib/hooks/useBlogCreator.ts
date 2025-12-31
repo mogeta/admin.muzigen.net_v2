@@ -6,7 +6,7 @@ import { BlogItem } from '@/lib/types/blog';
 export interface BlogFormData {
   title: string;
   description: string;
-  tag: string;
+  tags: string[];
   publish: boolean;
   ogpImage: string;
   content: string;
@@ -20,7 +20,7 @@ export function useBlogCreator() {
   // Form state - all start empty for new blog
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [tag, setTag] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [publish, setPublish] = useState(false);
   const [ogpImage, setOgpImage] = useState('');
   const [content, setContent] = useState('');
@@ -40,7 +40,7 @@ export function useBlogCreator() {
         description: description.trim(),
         publish,
         content: content.trim(),
-        tag: tag.trim() || undefined,
+        tags: tags.length > 0 ? tags : undefined,
         ogp_image: ogpImage.trim() || undefined,
       };
 
@@ -58,7 +58,7 @@ export function useBlogCreator() {
   const formData: BlogFormData = {
     title,
     description,
-    tag,
+    tags,
     publish,
     ogpImage,
     content,
@@ -67,7 +67,7 @@ export function useBlogCreator() {
   const formHandlers = {
     setTitle,
     setDescription,
-    setTag,
+    setTags,
     setPublish,
     setOgpImage,
     setContent,

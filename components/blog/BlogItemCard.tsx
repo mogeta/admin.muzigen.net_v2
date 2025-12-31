@@ -33,7 +33,7 @@ export default function BlogItemCard({ item }: BlogItemCardProps) {
       {/* Content */}
       <div className="p-6">
         {/* Status Badge */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
           <span
             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
               item.publish
@@ -43,11 +43,14 @@ export default function BlogItemCard({ item }: BlogItemCardProps) {
           >
             {item.publish ? 'Published' : 'Draft'}
           </span>
-          {item.tag && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-              {item.tag}
+          {item.tags && item.tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+            >
+              {tag}
             </span>
-          )}
+          ))}
         </div>
 
         {/* Title */}

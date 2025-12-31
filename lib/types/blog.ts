@@ -5,7 +5,7 @@ export interface BlogItem {
   title: string;
   description: string;
   publish: boolean;
-  tag?: string;
+  tags?: string[];
   ogp_image?: string;
   content_url?: string;
   markdown_url?: string;
@@ -23,7 +23,7 @@ export class Item implements BlogItem {
     public publish: boolean,
     public created_date: Timestamp,
     public update_date: Timestamp,
-    public tag?: string,
+    public tags?: string[],
     public ogp_image?: string,
     public content_url?: string,
     public markdown_url?: string,

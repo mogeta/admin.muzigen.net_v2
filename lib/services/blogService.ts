@@ -134,7 +134,7 @@ export class BlogService {
         created_date: now,
         update_date: now,
         // Only include optional fields if they have defined values
-        ...(data.tag !== undefined && { tag: data.tag }),
+        ...(data.tags !== undefined && { tags: data.tags }),
         ...(data.ogp_image !== undefined && { ogp_image: data.ogp_image }),
         ...(data.content_url !== undefined && { content_url: data.content_url }),
         ...(data.markdown_url !== undefined && { markdown_url: data.markdown_url }),

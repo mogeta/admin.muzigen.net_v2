@@ -6,7 +6,7 @@ import { BlogItem } from '@/lib/types/blog';
 export interface BlogFormData {
   title: string;
   description: string;
-  tag: string;
+  tags: string[];
   publish: boolean;
   ogpImage: string;
   content: string;
@@ -22,7 +22,7 @@ export function useBlogEditor(id: string) {
   // Form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [tag, setTag] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [publish, setPublish] = useState(false);
   const [ogpImage, setOgpImage] = useState('');
   const [content, setContent] = useState('');
@@ -36,7 +36,7 @@ export function useBlogEditor(id: string) {
           setBlogItem(item);
           setTitle(item.title);
           setDescription(item.description);
-          setTag(item.tag || '');
+          setTags(item.tags || []);
           setPublish(item.publish);
           setOgpImage(item.ogp_image || '');
           setContent(item.content || '');
@@ -76,8 +76,8 @@ export function useBlogEditor(id: string) {
       };
 
       // Only add optional fields if they have values
-      if (tag.trim()) {
-        updateData.tag = tag.trim();
+      if (tags.length > 0) {
+        updateData.tags = tags;
       }
       if (ogpImage.trim()) {
         updateData.ogp_image = ogpImage.trim();
@@ -97,7 +97,7 @@ export function useBlogEditor(id: string) {
   const formData: BlogFormData = {
     title,
     description,
-    tag,
+    tags,
     publish,
     ogpImage,
     content,
@@ -106,7 +106,7 @@ export function useBlogEditor(id: string) {
   const formHandlers = {
     setTitle,
     setDescription,
-    setTag,
+    setTags,
     setPublish,
     setOgpImage,
     setContent,

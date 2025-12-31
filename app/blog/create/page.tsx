@@ -42,12 +42,12 @@ function BlogCreatorContent() {
             <BlogMetadataForm
               title={formData.title}
               description={formData.description}
-              tag={formData.tag}
+              tags={formData.tags}
               ogpImage={formData.ogpImage}
               publish={formData.publish}
               onTitleChange={formHandlers.setTitle}
               onDescriptionChange={formHandlers.setDescription}
-              onTagChange={formHandlers.setTag}
+              onTagsChange={formHandlers.setTags}
               onOgpImageChange={formHandlers.setOgpImage}
               onPublishChange={formHandlers.setPublish}
             />
@@ -64,7 +64,7 @@ function BlogCreatorContent() {
               <BlogPreviewPanel
                 title={formData.title}
                 description={formData.description}
-                tag={formData.tag}
+                tags={formData.tags}
                 ogpImage={formData.ogpImage}
                 content={formData.content}
               />
