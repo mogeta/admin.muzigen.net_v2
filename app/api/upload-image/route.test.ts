@@ -31,6 +31,8 @@ vi.mock('@/lib/firebase-admin', () => ({
 // Mock sharp
 vi.mock('sharp', () => ({
   default: vi.fn(() => ({
+    rotate: vi.fn().mockReturnThis(),
+    resize: vi.fn().mockReturnThis(),
     webp: vi.fn(() => ({
       toBuffer: vi.fn().mockResolvedValue(Buffer.from('webp-image-data')),
     })),
@@ -55,12 +57,15 @@ function createMockFile(
 // Helper to create NextRequest with FormData
 function createNextRequest(
   headers: Record<string, string> = {},
-  file?: File
+  file?: File,
+  gallery = false
 ): NextRequest {
   const formData = new FormData();
   if (file) {
     formData.append('file', file);
   }
+
+  if (gallery) formData.append('gallery', 'true');
 
   const request = new NextRequest('http://localhost:3000/api/upload-image', {
     method: 'POST',
@@ -258,6 +263,22 @@ describe('POST /api/upload-image', () => {
       expect(json.success).toBe(true);
       expect(json.url).toBe('https://storage.googleapis.com/test-bucket/test-file.webp');
       expect(json.fileName).toBe('test-uuid-1234_20240101120000');
+    });
+
+    it('creates bounded gallery variants without publishing the original', async () => {
+      const sharp = (await import('sharp')).default;
+      const file = createMockFile('test-image', 'photo.jpg', 'image/jpeg');
+      const response = await POST(createNextRequest(validHeaders, file, true));
+      const json = await response.json();
+      expect(response.status).toBe(200);
+      expect(json.thumbnailUrl).toBeDefined();
+      expect(mockBucket.file).toHaveBeenCalledWith('gallery/test-uuid-1234_20240101120000.webp');
+      expect(mockBucket.file).toHaveBeenCalledWith('gallery/test-uuid-1234_20240101120000_thumb.webp');
+      expect(mockBucket.file).not.toHaveBeenCalledWith('img/test-uuid-1234_20240101120000.jpg');
+      const instances = vi.mocked(sharp).mock.results;
+      expect(instances[0].value.rotate).toHaveBeenCalled();
+      expect(instances[0].value.resize).toHaveBeenCalledWith({ width: 2400, height: 2400, fit: 'inside', withoutEnlargement: true });
+      expect(instances[1].value.resize).toHaveBeenCalledWith({ width: 480, height: 480, fit: 'cover', withoutEnlargement: true });
     });
 
     it('should handle upload errors gracefully', async () => {

@@ -47,9 +47,10 @@ export async function POST(request: NextRequest) {
 
     // FormDataから画像ファイルを取得
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get('file');
+    const gallery = formData.get('gallery') === 'true';
 
-    if (!file) {
+    if (!(file instanceof File)) {
       return NextResponse.json(
         { error: 'ファイルが見つかりません' },
         { status: 400 }
@@ -100,6 +101,21 @@ export async function POST(request: NextRequest) {
     // Firebase Admin Storageのインスタンスを取得
     const storage = getAdminStorage();
     const bucket = storage.bucket();
+
+    // Gallery variants are generated before storage writes; source dimensions are
+    // bounded and EXIF orientation is applied. Ordinary uploads retain their API.
+    if (gallery) {
+      const createImage = () => sharp(buffer, { limitInputPixels: 40_000_000 }).rotate();
+      const full = await createImage().resize({ width: 2400, height: 2400, fit: 'inside', withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
+      const thumbnail = await createImage().resize({ width: 480, height: 480, fit: 'cover', withoutEnlargement: true }).webp({ quality: 75 }).toBuffer();
+      const fullFile = bucket.file(`gallery/${baseFileName}.webp`);
+      const thumbFile = bucket.file(`gallery/${baseFileName}_thumb.webp`);
+      for (const [target, bytes] of [[fullFile, full], [thumbFile, thumbnail]] as const) {
+        await target.save(bytes, { metadata: { contentType: 'image/webp', cacheControl: 'public, max-age=31536000, immutable' } });
+        await target.makePublic();
+      }
+      return NextResponse.json({ success: true, url: fullFile.publicUrl(), thumbnailUrl: thumbFile.publicUrl(), fileName: baseFileName });
+    }
 
     // 元の画像をアップロード
     const originalFile = bucket.file(`img/${originalFileName}`);
