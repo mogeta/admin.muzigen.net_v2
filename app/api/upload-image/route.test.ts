@@ -1,8 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { POST } from './route';
+import { createR2GalleryStorage, R2ConfigurationError } from '@/lib/r2-gallery';
 import { NextRequest } from 'next/server';
 import { verifyIdToken, resetAuthAdminMocks } from '__mocks__/firebase-admin/auth';
 import { mockFile, mockBucket, resetStorageAdminMocks } from '__mocks__/firebase-admin/storage';
+
+const { r2Upload } = vi.hoisted(() => ({ r2Upload: vi.fn() }));
+vi.mock('@/lib/r2-gallery', () => ({
+  createR2GalleryStorage: vi.fn(() => ({ upload: r2Upload })),
+  R2ConfigurationError: class extends Error {},
+}));
 
 // Mock firebase-admin modules
 vi.mock('firebase-admin/auth', async () => {
@@ -81,6 +88,7 @@ describe('POST /api/upload-image', () => {
     resetAuthAdminMocks();
     resetStorageAdminMocks();
     vi.clearAllMocks();
+    r2Upload.mockReset().mockResolvedValue({ url: 'https://images.example.com/gallery/full.webp', thumbnailUrl: 'https://images.example.com/gallery/thumb.webp' });
 
     // Mock Date.now for consistent timestamps
     vi.spyOn(Date.prototype, 'toISOString').mockReturnValue('2024-01-01T12:00:00.000Z');
@@ -272,13 +280,32 @@ describe('POST /api/upload-image', () => {
       const json = await response.json();
       expect(response.status).toBe(200);
       expect(json.thumbnailUrl).toBeDefined();
-      expect(mockBucket.file).toHaveBeenCalledWith('gallery/test-uuid-1234_20240101120000.webp');
-      expect(mockBucket.file).toHaveBeenCalledWith('gallery/test-uuid-1234_20240101120000_thumb.webp');
+      expect(r2Upload).toHaveBeenCalledWith('test-uuid-1234_20240101120000', expect.any(Buffer), expect.any(Buffer));
+      expect(json.url).toBe('https://images.example.com/gallery/full.webp');
+      expect(json.thumbnailUrl).toBe('https://images.example.com/gallery/thumb.webp');
+      expect(mockBucket.file).not.toHaveBeenCalled();
       expect(mockBucket.file).not.toHaveBeenCalledWith('img/test-uuid-1234_20240101120000.jpg');
       const instances = vi.mocked(sharp).mock.results;
       expect(instances[0].value.rotate).toHaveBeenCalled();
       expect(instances[0].value.resize).toHaveBeenCalledWith({ width: 2400, height: 2400, fit: 'inside', withoutEnlargement: true });
       expect(instances[1].value.resize).toHaveBeenCalledWith({ width: 480, height: 480, fit: 'cover', withoutEnlargement: true });
+    });
+
+    it('returns 503 for missing R2 configuration without falling back to Firebase Storage', async () => {
+      vi.mocked(createR2GalleryStorage).mockImplementationOnce(() => { throw new R2ConfigurationError('Missing setting'); });
+      const response = await POST(createNextRequest(validHeaders, createMockFile('image', 'photo.jpg', 'image/jpeg'), true));
+      expect(response.status).toBe(503);
+      expect((await response.json()).error).toContain('R2');
+      expect(mockBucket.file).not.toHaveBeenCalled();
+      expect(r2Upload).not.toHaveBeenCalled();
+    });
+
+    it('does not report success or use Firebase Storage after an R2 failure', async () => {
+      r2Upload.mockRejectedValueOnce(new Error('R2 unavailable'));
+      const response = await POST(createNextRequest(validHeaders, createMockFile('image', 'photo.jpg', 'image/jpeg'), true));
+      expect(response.status).toBe(500);
+      expect((await response.json()).success).toBeUndefined();
+      expect(mockBucket.file).not.toHaveBeenCalled();
     });
 
     it('should handle upload errors gracefully', async () => {

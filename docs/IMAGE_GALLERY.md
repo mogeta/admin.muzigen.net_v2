@@ -1,5 +1,7 @@
 # Blog image galleries
 
+New gallery images use Cloudflare R2 and a custom-domain CDN. See [R2 setup](./R2_SETUP.md) for the required server secrets, domain configuration and rollout checks. Ordinary single-image uploads and existing Firebase Storage URLs are unchanged.
+
 Articles may contain a fenced `gallery` block anywhere in Markdown. The admin editor generates and edits these blocks; existing articles and ordinary images are unchanged.
 
 ````markdown

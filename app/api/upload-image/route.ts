@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminStorage, getAdminApp } from '@/lib/firebase-admin';
 import { getAuth } from 'firebase-admin/auth';
 import sharp from 'sharp';
+import { createR2GalleryStorage, R2ConfigurationError } from '@/lib/r2-gallery';
 import { v4 as uuidv4 } from 'uuid';
 
 // 最大ファイルサイズ: 10MB
@@ -98,24 +99,18 @@ export async function POST(request: NextRequest) {
     // WebPファイル名
     const webpFileName = `${baseFileName}.webp`;
 
-    // Firebase Admin Storageのインスタンスを取得
-    const storage = getAdminStorage();
-    const bucket = storage.bucket();
-
     // Gallery variants are generated before storage writes; source dimensions are
     // bounded and EXIF orientation is applied. Ordinary uploads retain their API.
     if (gallery) {
+      const galleryStorage = createR2GalleryStorage();
       const createImage = () => sharp(buffer, { limitInputPixels: 40_000_000 }).rotate();
       const full = await createImage().resize({ width: 2400, height: 2400, fit: 'inside', withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
       const thumbnail = await createImage().resize({ width: 480, height: 480, fit: 'cover', withoutEnlargement: true }).webp({ quality: 75 }).toBuffer();
-      const fullFile = bucket.file(`gallery/${baseFileName}.webp`);
-      const thumbFile = bucket.file(`gallery/${baseFileName}_thumb.webp`);
-      for (const [target, bytes] of [[fullFile, full], [thumbFile, thumbnail]] as const) {
-        await target.save(bytes, { metadata: { contentType: 'image/webp', cacheControl: 'public, max-age=31536000, immutable' } });
-        await target.makePublic();
-      }
-      return NextResponse.json({ success: true, url: fullFile.publicUrl(), thumbnailUrl: thumbFile.publicUrl(), fileName: baseFileName });
+      const urls = await galleryStorage.upload(baseFileName, full, thumbnail);
+      return NextResponse.json({ success: true, ...urls, fileName: baseFileName });
     }
+
+    const bucket = getAdminStorage().bucket();
 
     // 元の画像をアップロード
     const originalFile = bucket.file(`img/${originalFileName}`);
@@ -153,6 +148,10 @@ export async function POST(request: NextRequest) {
       fileName: baseFileName,
     });
   } catch (error) {
+    if (error instanceof R2ConfigurationError) {
+      console.error('R2 configuration error:', error.message);
+      return NextResponse.json({ error: '画像ストレージの設定が未完了です。管理者がR2設定を確認してください。' }, { status: 503 });
+    }
     console.error('画像アップロードエラー:', error);
 
     // エラーの詳細をログに記録
