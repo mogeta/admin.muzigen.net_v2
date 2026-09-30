@@ -42,3 +42,5 @@ next-env.d.ts
 
 .idea
 .claude
+# Placeholder configuration only; actual credentials remain ignored.
+!.env.r2.example

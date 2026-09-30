@@ -3,6 +3,7 @@
 import { useMemo, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import 'easymde/dist/easymde.min.css';
+import GalleryEditor from './GalleryEditor';
 import ImageUploader from './ImageUploader';
 
 const SimpleMDE = dynamic(() => import('react-simplemde-editor'), {
@@ -84,6 +85,12 @@ export default function BlogContentEditor({
 
       {/* 画像アップローダー */}
       <ImageUploader onImageUploaded={handleImageUploaded} />
+
+      <GalleryEditor content={content} onContentChange={onContentChange} onInsert={(markdown) => {
+        const cm = simpleMdeInstanceRef.current?.codemirror;
+        if (cm) { cm.replaceSelection(markdown); cm.focus(); }
+        else onContentChange(content + markdown);
+      }} />
 
       {/* マークダウンエディター */}
       <SimpleMDE
